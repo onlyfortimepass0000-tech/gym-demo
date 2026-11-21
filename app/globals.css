@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #0a0b0d;
+  --surface: #121418;
+  --surface-2: #181b21;
+  --line: #23272f;
+  --line-2: #2c313b;
+  --fg: #f1f2f4;
+  --fg-2: #a4a9b4;
+  --fg-3: #6b7280;
+  --accent: #d4ff3d;
+  --accent-ink: #0a0b0d;
+  --warm: #ff8a3d;
+  --danger: #ff5c5c;
+  --good: #58d68d;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  font-feature-settings: "ss01", "cv11";
+}
+
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    min-width: 0;
+  }
+  .card-flat {
+    background: transparent;
+    border: 1px dashed var(--line-2);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+  .muted {
+    color: var(--fg-2);
+  }
+  .faint {
+    color: var(--fg-3);
+  }
+  .k {
+    font-size: 12px;
+    color: var(--fg-2);
+    font-weight: 500;
+  }
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 14px 0;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--fg-2);
+  }
+  .pill-good {
+    color: var(--good);
+    border-color: rgba(88, 214, 141, 0.3);
+    background: rgba(88, 214, 141, 0.08);
+  }
+  .pill-warn {
+    color: var(--warm);
+    border-color: rgba(255, 138, 61, 0.3);
+    background: rgba(255, 138, 61, 0.08);
+  }
+  .pill-danger {
+    color: var(--danger);
+    border-color: rgba(255, 92, 92, 0.3);
+    background: rgba(255, 92, 92, 0.08);
+  }
+  .pill-accent {
+    color: var(--accent-ink);
+    background: var(--accent);
+    border-color: transparent;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--line-2);
+    background: var(--surface-2);
+    color: var(--fg);
+    transition: background 0.15s, border-color 0.15s, transform 0.08s;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: #22262e;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: transparent;
+  }
+  .btn-primary:hover {
+    background: #e5ff5a;
+  }
+  .btn-ghost {
+    background: transparent;
+  }
+  .btn-sm {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+  .btn-lg {
+    padding: 16px 24px;
+    font-size: 15px;
+  }
+  .btn-full {
+    width: 100%;
+  }
+  .bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 999px;
+  }
+  .bar-warm > span {
+    background: var(--warm);
+  }
+  .bar-good > span {
+    background: var(--good);
+  }
+  .bar-danger > span {
+    background: var(--danger);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .chip {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .chip-sel {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: transparent;
+    font-weight: 600;
+  }
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    font: inherit;
+  }
+  .input:focus {
+    border-color: var(--accent);
+    outline: none;
+  }
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+  }
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
