@@ -41,9 +41,7 @@ export function memberById(ctx: Ctx, id: string): Member | undefined {
 const derivedPlans = new Map<string, TrainingPlan>();
 const derivedNutrition = new Map<string, NutritionPlan>();
 
-export function planOf(ctx: Ctx, m: Member): TrainingPlan | undefined {
-  const stored = ctx.store.plans[m.id];
-  if (stored) return stored;
+function derivedPlan(m: Member): TrainingPlan | undefined {
   if (m.blank) return undefined;
   let p = derivedPlans.get(m.id);
   if (!p) {
@@ -51,6 +49,22 @@ export function planOf(ctx: Ctx, m: Member): TrainingPlan | undefined {
     derivedPlans.set(m.id, p);
   }
   return p;
+}
+
+export function planOf(ctx: Ctx, m: Member): TrainingPlan | undefined {
+  return ctx.store.plans[m.id] ?? derivedPlan(m);
+}
+
+// The plan that was in force on a given day. Replacing a plan must not
+// rewrite history: earlier days keep the schedule the member was on then.
+export function planAt(ctx: Ctx, m: Member, dayTs: number): TrainingPlan | undefined {
+  const stored = ctx.store.plans[m.id];
+  if (stored && startOfDay(dayTs) >= startOfDay(stored.createdAt)) return stored;
+  return derivedPlan(m);
+}
+
+export function weekdaysOn(ctx: Ctx, m: Member, dayTs: number): number[] {
+  return planAt(ctx, m, dayTs)?.weekdays ?? [];
 }
 
 export function nutritionOf(ctx: Ctx, m: Member): NutritionPlan | undefined {
@@ -66,15 +80,15 @@ export function nutritionOf(ctx: Ctx, m: Member): NutritionPlan | undefined {
 }
 
 export function plannedWeekdays(ctx: Ctx, m: Member): number[] {
-  const p = planOf(ctx, m);
-  if (p) return p.weekdays;
-  return m.blank ? [] : WEEKDAYS_BY_DAYS[m.daysPerWeek];
+  return planOf(ctx, m)?.weekdays ?? [];
 }
 
+// First day that has a planned schedule at all.
 export function planStartDay(ctx: Ctx, m: Member): number {
   const joined = startOfDay(ctx.now) - m.joinedDaysAgo * DAY;
+  if (!m.blank) return joined;
   const stored = ctx.store.plans[m.id];
-  return stored ? Math.max(joined, startOfDay(stored.createdAt)) : joined;
+  return stored ? Math.max(joined, startOfDay(stored.createdAt)) : Number.POSITIVE_INFINITY;
 }
 
 export function sessionForWeekday(plan: TrainingPlan | undefined, weekday: number): PlannedSession | undefined {
@@ -106,9 +120,8 @@ export function dayInfo(ctx: Ctx, m: Member, ts: number, byDay: Map<string, Sess
   const today = startOfDay(ctx.now);
   const key = dayKey(day);
   const sessions = byDay.get(key) ?? [];
-  const weekdays = plannedWeekdays(ctx, m);
-  const isPlanned = weekdays.includes(new Date(day).getDay());
-  const plan = planOf(ctx, m);
+  const plan = planAt(ctx, m, day);
+  const isPlanned = (plan?.weekdays ?? []).includes(new Date(day).getDay());
   const planned = isPlanned ? sessionForWeekday(plan, new Date(day).getDay()) : undefined;
   const joined = startOfDay(ctx.now) - m.joinedDaysAgo * DAY;
   const start = planStartDay(ctx, m);
@@ -149,7 +162,7 @@ export function adherence(ctx: Ctx, m: Member, sessions: Session[], days = 28): 
     const d = addDays(today, -i);
     const info = dayInfo(ctx, m, d, byDay);
     if (info.status === "attended" || info.status === "inside") {
-      if (plannedWeekdays(ctx, m).includes(new Date(d).getDay()) && d >= planStartDay(ctx, m)) {
+      if (weekdaysOn(ctx, m, d).includes(new Date(d).getDay()) && d >= planStartDay(ctx, m)) {
         planned++;
         attended++;
       } else extra++;

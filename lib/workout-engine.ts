@@ -46,9 +46,11 @@ export type LibraryExercise = {
   unit: Unit;
   unilateral: boolean;
   regression?: string; // safer / easier substitute id
+  accessoryOnly: boolean; // not a sensible main/secondary lift
+  repsOverride?: string; // skill moves with their own realistic rep range
 };
 
-type ExOpts = { unit?: Unit; uni?: boolean; reg?: string };
+type ExOpts = { unit?: Unit; uni?: boolean; reg?: string; acc?: boolean; reps?: string };
 
 function E(
   id: string,
@@ -73,6 +75,8 @@ function E(
     unit: opts.unit ?? "reps",
     unilateral: !!opts.uni,
     regression: opts.reg,
+    accessoryOnly: !!opts.acc,
+    repsOverride: opts.reps,
   };
 }
 
@@ -81,12 +85,12 @@ export const EXERCISE_LIBRARY: LibraryExercise[] = [
   E("back-squat", "Barbell back squat", "squat", "quads,glutes", "barbell", 3, "lower-back", "Brace hard, sit between your hips, drive the floor away.", { reg: "goblet-squat" }),
   E("goblet-squat", "Goblet squat", "squat", "quads,glutes", "dumbbell|kettlebell", 1, "", "Hold the weight at your chest and sit tall between your heels.", { reg: "box-squat" }),
   E("sumo-goblet", "Sumo goblet squat", "squat", "quads,adductors,glutes", "dumbbell|kettlebell", 1, "", "Wide stance, toes out, drop straight down between your knees."),
-  E("heel-goblet", "Heel-elevated goblet squat", "squat", "quads", "dumbbell|kettlebell", 2, "knee", "Heels on a plate, knees travel forward, torso stays upright.", { reg: "sumo-goblet" }),
+  E("heel-goblet", "Heel-elevated goblet squat", "squat", "quads", "dumbbell|kettlebell", 2, "knee", "Heels on a plate, knees travel forward, torso stays upright.", { reg: "sumo-goblet", acc: true }),
   E("leg-press", "Leg press", "squat", "quads,glutes", "machine", 1, "", "Feet shoulder-width, lower to about 90° at the knee, press without locking out."),
   E("box-squat", "Box squat to a bench", "squat", "quads,glutes", "bodyweight", 1, "", "Sit back until you lightly touch the box, then stand without rocking."),
   E("bw-squat", "Bodyweight squat", "squat", "quads,glutes", "bodyweight", 1, "knee", "Weight mid-foot, chest up, hips back and down.", { reg: "box-squat" }),
   E("band-squat", "Banded squat", "squat", "quads,glutes", "band", 1, "knee", "Stand on the band, handles at your shoulders, squat tall.", { reg: "box-squat" }),
-  E("pistol-box", "Assisted box pistol squat", "squat", "quads,glutes", "bodyweight", 3, "knee", "Lower on one leg to a box; use a hand for balance only.", { uni: true, reg: "box-squat" }),
+  E("pistol-box", "Assisted box pistol squat", "squat", "quads,glutes", "bodyweight", 3, "knee", "Lower on one leg to a box; use a hand for balance only.", { uni: true, reg: "box-squat", acc: true, reps: "5–8 / side" }),
 
   // hinge
   E("rdl", "Romanian deadlift", "hinge", "hamstrings,glutes", "barbell|dumbbell", 2, "lower-back", "Push your hips back, keep the weight close, back flat.", { reg: "kb-deadlift" }),
@@ -96,8 +100,8 @@ export const EXERCISE_LIBRARY: LibraryExercise[] = [
   E("band-pull-through", "Banded pull-through", "hinge", "hamstrings,glutes", "band", 1, "", "Anchor the band low, hinge back, drive your hips through."),
   E("bw-hinge", "Bodyweight hip hinge", "hinge", "hamstrings,glutes", "bodyweight", 1, "", "Hands on hips, soft knees, push your hips back until your hamstrings stretch."),
   E("sl-rdl", "Single-leg Romanian deadlift", "hinge", "hamstrings,glutes", "dumbbell|kettlebell|bodyweight", 2, "", "Hinge on one leg, back leg reaches long, hips stay square.", { uni: true, reg: "bw-hinge" }),
-  E("back-ext", "45° back extension", "hinge", "spinal erectors,glutes", "machine", 2, "lower-back", "Hinge at the hips; stop when your body is in one line."),
-  E("band-gm", "Banded good morning", "hinge", "hamstrings,glutes", "band", 2, "lower-back", "Band across your shoulders, hinge back with a flat spine.", { reg: "band-pull-through" }),
+  E("back-ext", "45° back extension", "hinge", "spinal erectors,glutes", "machine", 2, "lower-back", "Hinge at the hips; stop when your body is in one line.", { acc: true }),
+  E("band-gm", "Banded good morning", "hinge", "hamstrings,glutes", "band", 2, "lower-back", "Band across your shoulders, hinge back with a flat spine.", { reg: "band-pull-through", acc: true }),
 
   // glute
   E("hip-thrust", "Barbell hip thrust", "glute", "glutes", "barbell", 2, "", "Chin tucked, ribs down, squeeze your glutes hard at the top.", { reg: "db-hip-thrust" }),
@@ -105,9 +109,9 @@ export const EXERCISE_LIBRARY: LibraryExercise[] = [
   E("glute-bridge", "Glute bridge", "glute", "glutes", "bodyweight", 1, "", "Feet flat, ribs down, press up and pause for 2 seconds."),
   E("sl-bridge", "Single-leg glute bridge", "glute", "glutes", "bodyweight", 2, "", "Keep your hips level as you lift on one leg.", { uni: true, reg: "glute-bridge" }),
   E("band-bridge", "Banded glute bridge", "glute", "glutes", "band", 1, "", "Band above the knees, press your knees out as you lift.", { reg: "glute-bridge" }),
-  E("kickback", "Cable glute kickback", "glute", "glutes", "cable", 2, "", "Hinge slightly, kick straight back without arching.", { uni: true }),
-  E("band-walk", "Lateral band walk", "glute", "glute medius", "band", 1, "", "Band above the knees, small steps, toes forward, stay low.", { unit: "steps" }),
-  E("hip-abduction", "Machine hip abduction", "glute", "glute medius", "machine", 1, "", "Sit tall and press the pads out under control."),
+  E("kickback", "Cable glute kickback", "glute", "glutes", "cable", 2, "", "Hinge slightly, kick straight back without arching.", { uni: true, acc: true }),
+  E("band-walk", "Lateral band walk", "glute", "glute medius", "band", 1, "", "Band above the knees, small steps, toes forward, stay low.", { unit: "steps", acc: true }),
+  E("hip-abduction", "Machine hip abduction", "glute", "glute medius", "machine", 1, "", "Sit tall and press the pads out under control.", { acc: true }),
 
   // lunge / single-leg
   E("split-squat", "Split squat", "lunge", "quads,glutes", "bodyweight|dumbbell", 2, "knee", "Long stance, drop straight down, front heel stays planted.", { uni: true, reg: "step-up" }),
@@ -122,17 +126,17 @@ export const EXERCISE_LIBRARY: LibraryExercise[] = [
   E("db-bench", "Dumbbell bench press", "push-h", "chest,triceps", "dumbbell", 2, "", "Elbows about 45° from your body, lower to the chest line, press up.", { reg: "floor-press" }),
   E("machine-press", "Machine chest press", "push-h", "chest,triceps", "machine", 1, "", "Seat so the handles line up with mid-chest, press without shrugging."),
   E("incline-db", "Incline dumbbell press", "push-h", "upper chest,triceps", "dumbbell", 2, "shoulder", "Bench at 30°, press up and slightly in, control the way down.", { reg: "db-bench" }),
-  E("cable-fly", "Cable chest fly", "push-h", "chest", "cable", 2, "shoulder", "Soft elbows, hug a barrel, squeeze your hands together.", { reg: "machine-press" }),
+  E("cable-fly", "Cable chest fly", "push-h", "chest", "cable", 2, "shoulder", "Soft elbows, hug a barrel, squeeze your hands together.", { reg: "machine-press", acc: true }),
   E("floor-press", "Dumbbell floor press", "push-h", "chest,triceps", "dumbbell", 1, "", "Lie on the floor, let your elbows touch down, pause, press."),
   E("squeeze-press", "Dumbbell squeeze press", "push-h", "chest,triceps", "dumbbell", 1, "", "Press the dumbbells together the whole rep and push straight up.", { reg: "floor-press" }),
   E("pushup", "Push-up", "push-h", "chest,triceps,core", "bodyweight", 2, "wrist", "Body in one line, elbows about 45°, chest to the floor.", { reg: "incline-fist-pushup" }),
   E("incline-pushup", "Incline push-up (hands on a bench)", "push-h", "chest,triceps", "bodyweight", 1, "wrist", "Hands on a bench, body in one line, lower your chest to the edge.", { reg: "incline-fist-pushup" }),
-  E("knee-pushup", "Knee push-up", "push-h", "chest,triceps", "bodyweight", 1, "wrist", "Hips in line with shoulders and knees, chest to the floor.", { reg: "wall-pushup" }),
+  E("knee-pushup", "Knee push-up", "push-h", "chest,triceps", "bodyweight", 1, "wrist|knee", "Hips in line with shoulders and knees, chest to the floor.", { reg: "wall-pushup" }),
   E("fist-pushup", "Push-up on fists", "push-h", "chest,triceps,core", "bodyweight", 2, "", "Knuckles down, wrists straight, body in one line.", { reg: "incline-fist-pushup" }),
   E("incline-fist-pushup", "Incline push-up on fists", "push-h", "chest,triceps", "bodyweight", 1, "", "Fists on a bench or counter, wrists straight, lower under control.", { reg: "wall-pushup" }),
   E("wall-pushup", "Wall push-up on fists", "push-h", "chest,triceps", "bodyweight", 1, "", "Fists on the wall, step your feet back, lower your chest to the wall."),
   E("band-press", "Banded chest press", "push-h", "chest,triceps", "band", 1, "", "Anchor the band behind you, press out and squeeze your chest.", { reg: "wall-pushup" }),
-  E("dips", "Parallel-bar dip", "push-h", "chest,triceps", "bodyweight", 3, "shoulder|wrist", "Lean slightly forward, lower until your upper arms are parallel.", { reg: "incline-fist-pushup" }),
+  E("dips", "Parallel-bar dip", "push-h", "chest,triceps", "bodyweight", 3, "shoulder|wrist", "Lean slightly forward, lower until your upper arms are parallel.", { reg: "incline-fist-pushup", reps: "6–10" }),
 
   // vertical push
   E("ohp", "Standing barbell overhead press", "push-v", "shoulders,triceps", "barbell", 3, "shoulder|lower-back", "Squeeze your glutes, press the bar up past your face, head through at the top.", { reg: "landmine" }),
@@ -154,14 +158,14 @@ export const EXERCISE_LIBRARY: LibraryExercise[] = [
   E("towel-row", "Door-frame towel row", "pull-h", "back,biceps", "bodyweight", 1, "", "Wrap a towel around a sturdy door frame, lean back and row your chest to your hands."),
 
   // vertical pull
-  E("pullup", "Pull-up", "pull-v", "lats,biceps", "bodyweight", 3, "shoulder", "Start from a full hang, pull your chest to the bar.", { reg: "lat-pulldown" }),
+  E("pullup", "Pull-up", "pull-v", "lats,biceps", "bodyweight", 3, "shoulder", "Start from a full hang, pull your chest to the bar.", { reg: "lat-pulldown", reps: "5–8" }),
   E("assisted-pullup", "Assisted pull-up", "pull-v", "lats,biceps", "machine", 2, "shoulder", "Full hang to chin over the bar, control the lowering.", { reg: "lat-pulldown" }),
   E("lat-pulldown", "Lat pulldown", "pull-v", "lats,biceps", "cable|machine", 1, "", "Pull the bar to your upper chest, elbows down toward your ribs."),
   E("band-pulldown", "Banded lat pulldown", "pull-v", "lats,biceps", "band", 1, "", "Anchor the band overhead, pull your elbows down to your ribs."),
-  E("straight-arm", "Straight-arm pulldown", "pull-v", "lats", "cable", 2, "", "Arms nearly straight, sweep the bar to your thighs, feel your lats."),
+  E("straight-arm", "Straight-arm pulldown", "pull-v", "lats", "cable", 2, "", "Arms nearly straight, sweep the bar to your thighs, feel your lats.", { acc: true }),
   E("superman-pd", "Prone superman pull-down", "pull-v", "lats,upper back", "bodyweight", 1, "lower-back", "Lie face down, arms overhead, pull your elbows to your ribs."),
-  E("db-pullover", "Dumbbell pullover", "pull-v", "lats,chest", "dumbbell", 2, "shoulder", "Soft elbows, lower the dumbbell behind your head, pull it back over your chest."),
-  E("dead-hang", "Dead hang", "pull-v", "lats,grip", "bodyweight", 1, "shoulder", "Hang with active shoulders, ribs down, breathe slowly.", { unit: "sec" }),
+  E("db-pullover", "Dumbbell pullover", "pull-v", "lats,chest", "dumbbell", 2, "shoulder", "Soft elbows, lower the dumbbell behind your head, pull it back over your chest.", { acc: true }),
+  E("dead-hang", "Dead hang", "pull-v", "lats,grip", "bodyweight", 1, "shoulder", "Hang with active shoulders, ribs down, breathe slowly.", { unit: "sec", acc: true }),
 
   // rear delts / upper back health
   E("face-pull", "Face pull", "rear-delt", "rear delts,upper back", "cable", 1, "", "Pull the rope to your forehead, elbows high, rotate your hands out."),
@@ -182,7 +186,7 @@ export const EXERCISE_LIBRARY: LibraryExercise[] = [
   E("bb-curl", "Barbell curl", "arms-bi", "biceps", "barbell", 1, "wrist", "Elbows at your sides, curl without swinging your torso.", { reg: "hammer-curl" }),
   E("cable-curl", "Cable curl", "arms-bi", "biceps", "cable", 1, "", "Elbows at your sides, curl to your chin, control the return."),
   E("band-curl", "Banded curl", "arms-bi", "biceps", "band", 1, "", "Stand on the band, elbows still, curl up and lower slowly."),
-  E("chinup", "Chin-up", "arms-bi", "biceps,lats", "bodyweight", 3, "shoulder", "Palms toward you, full hang to chin over the bar.", { reg: "cable-curl" }),
+  E("chinup", "Chin-up", "arms-bi", "biceps,lats", "bodyweight", 3, "shoulder", "Palms toward you, full hang to chin over the bar.", { reg: "cable-curl", reps: "5–8" }),
 
   // triceps
   E("pushdown", "Cable triceps pushdown", "arms-tri", "triceps", "cable", 1, "", "Elbows pinned, push down until your arms are straight, pause."),
@@ -247,66 +251,56 @@ export function isAvailable(ex: LibraryExercise, setup: Setup): boolean {
 type Slot = { pattern: Pattern; kind: Kind };
 const slot = (pattern: Pattern, kind: Kind): Slot => ({ pattern, kind });
 
-type Template = { name: string; focus: string; region: "lower" | "upper" | "full" | "push" | "pull"; slots: Slot[] };
+type Template = { name: string; region: "lower" | "upper" | "full" | "push" | "pull"; slots: Slot[] };
 
 const TEMPLATES: Record<string, Template> = {
   fullA: {
     name: "Full body A",
-    focus: "Squat-led full body: legs, a press, a row and a hinge in one session.",
     region: "full",
     slots: [slot("squat", "main"), slot("push-h", "main"), slot("pull-h", "main"), slot("hinge", "secondary"), slot("core", "core"), slot("push-v", "secondary"), slot("glute", "accessory"), slot("calf", "accessory"), slot("rear-delt", "accessory"), slot("carry", "accessory")],
   },
   fullB: {
     name: "Full body B",
-    focus: "Hinge-led full body: deadlift pattern, overhead press and a vertical pull.",
     region: "full",
     slots: [slot("hinge", "main"), slot("push-v", "main"), slot("pull-v", "main"), slot("lunge", "secondary"), slot("push-h", "secondary"), slot("core", "core"), slot("arms-bi", "accessory"), slot("arms-tri", "accessory"), slot("calf", "accessory"), slot("rear-delt", "accessory")],
   },
   fullC: {
     name: "Full body C",
-    focus: "Single-leg and glute emphasis with a horizontal press and a vertical pull.",
     region: "full",
     slots: [slot("lunge", "main"), slot("push-h", "main"), slot("pull-v", "main"), slot("glute", "secondary"), slot("pull-h", "secondary"), slot("core", "core"), slot("push-v", "secondary"), slot("carry", "accessory"), slot("arms-tri", "accessory"), slot("calf", "accessory")],
   },
   upperA: {
     name: "Upper A",
-    focus: "Horizontal press and row first, then shoulders and arms.",
     region: "upper",
     slots: [slot("push-h", "main"), slot("pull-h", "main"), slot("push-v", "secondary"), slot("pull-v", "secondary"), slot("delts-side", "accessory"), slot("arms-bi", "accessory"), slot("arms-tri", "accessory"), slot("rear-delt", "accessory"), slot("core", "core")],
   },
   upperB: {
     name: "Upper B",
-    focus: "Overhead press and vertical pull first, then rear delts and arms.",
     region: "upper",
     slots: [slot("push-v", "main"), slot("pull-v", "main"), slot("push-h", "secondary"), slot("pull-h", "secondary"), slot("rear-delt", "accessory"), slot("arms-tri", "accessory"), slot("arms-bi", "accessory"), slot("delts-side", "accessory"), slot("core", "core")],
   },
   lowerA: {
     name: "Lower A",
-    focus: "Squat first, then hinge, single-leg work and calves.",
     region: "lower",
     slots: [slot("squat", "main"), slot("hinge", "main"), slot("lunge", "secondary"), slot("glute", "accessory"), slot("calf", "accessory"), slot("core", "core"), slot("carry", "accessory"), slot("glute", "accessory")],
   },
   lowerB: {
     name: "Lower B",
-    focus: "Hinge first, then squat pattern, glutes and single-leg work.",
     region: "lower",
     slots: [slot("hinge", "main"), slot("squat", "main"), slot("glute", "secondary"), slot("lunge", "secondary"), slot("calf", "accessory"), slot("core", "core"), slot("carry", "accessory"), slot("glute", "accessory")],
   },
   push: {
     name: "Push",
-    focus: "Chest, shoulders and triceps.",
     region: "push",
     slots: [slot("push-h", "main"), slot("push-v", "main"), slot("push-h", "secondary"), slot("delts-side", "accessory"), slot("arms-tri", "accessory"), slot("arms-tri", "accessory"), slot("core", "core"), slot("rear-delt", "accessory"), slot("push-v", "secondary")],
   },
   pull: {
     name: "Pull",
-    focus: "Back, rear delts and biceps.",
     region: "pull",
     slots: [slot("pull-v", "main"), slot("pull-h", "main"), slot("pull-h", "secondary"), slot("rear-delt", "accessory"), slot("arms-bi", "accessory"), slot("arms-bi", "accessory"), slot("core", "core"), slot("pull-v", "secondary"), slot("rear-delt", "accessory")],
   },
   legs: {
     name: "Legs",
-    focus: "Quads, hamstrings, glutes and calves.",
     region: "lower",
     slots: [slot("squat", "main"), slot("hinge", "main"), slot("lunge", "secondary"), slot("glute", "accessory"), slot("calf", "accessory"), slot("core", "core"), slot("carry", "accessory"), slot("glute", "accessory")],
   },
@@ -334,6 +328,14 @@ const REST_LOGIC: Record<2 | 3 | 4 | 5, string> = {
   3: "Monday, Wednesday and Friday keep one full rest day between sessions.",
   4: "Monday/Tuesday and Thursday/Friday alternate upper and lower days, so no muscle group trains two days running.",
   5: "Monday to Wednesday run push, pull and legs; Friday and Saturday add upper and lower, leaving Thursday and Sunday as full rest days.",
+};
+
+const REGION_FOCUS: Record<Template["region"], string> = {
+  lower: "Legs and glutes.",
+  upper: "Chest, back, shoulders and arms.",
+  full: "Whole body in one session.",
+  push: "Chest, shoulders and triceps.",
+  pull: "Back, rear delts and biceps.",
 };
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -383,12 +385,12 @@ const REST_FLOOR: Record<Goal, Record<Kind, number>> = {
 };
 
 const START_COUNT: Record<Minutes, number> = { 30: 4, 45: 5, 60: 6, 75: 7 };
-const WARMUP_MIN: Record<Minutes, number> = { 30: 5, 45: 6, 60: 7, 75: 8 };
+const WARMUP_MIN: Record<Minutes, number> = { 30: 5, 45: 6, 60: 7, 75: 10 };
 const FINISH_MIN: Record<Goal, Record<Minutes, number>> = {
-  "fat-loss": { 30: 5, 45: 7, 60: 9, 75: 12 },
-  general: { 30: 4, 45: 6, 60: 8, 75: 10 },
-  muscle: { 30: 0, 45: 3, 60: 5, 75: 6 },
-  strength: { 30: 0, 45: 3, 60: 5, 75: 6 },
+  "fat-loss": { 30: 5, 45: 7, 60: 9, 75: 15 },
+  general: { 30: 4, 45: 6, 60: 8, 75: 12 },
+  muscle: { 30: 0, 45: 3, 60: 5, 75: 8 },
+  strength: { 30: 0, 45: 3, 60: 5, 75: 8 },
 };
 
 const WORK_SEC = 40;
@@ -437,10 +439,11 @@ function ceilingFor(exp: Experience): Difficulty {
   return exp === "never" ? 1 : exp === "intermediate" ? 3 : 2;
 }
 
-function score(ex: LibraryExercise, ctx: Ctx): number {
+function score(ex: LibraryExercise, ctx: Ctx, kind: Kind): number {
   let s = 0;
+  const lift = kind === "main" || kind === "secondary";
   const have = (e: Equipment) => ex.equip.includes(e) && SETUP_EQUIPMENT[ctx.setup].includes(e);
-  if (ctx.exp === "intermediate") s += ex.difficulty * 2;
+  if (lift && ctx.exp === "intermediate") s += ex.difficulty * 2;
   else if (ctx.exp === "never") s -= ex.difficulty * 1.5;
   if (ctx.goal === "strength") {
     if (have("barbell")) s += 3;
@@ -458,11 +461,11 @@ function score(ex: LibraryExercise, ctx: Ctx): number {
   return s;
 }
 
-function best(list: LibraryExercise[], ctx: Ctx): LibraryExercise {
+function best(list: LibraryExercise[], ctx: Ctx, kind: Kind): LibraryExercise {
   let top = list[0];
-  let topScore = score(top, ctx);
+  let topScore = score(top, ctx, kind);
   for (let i = 1; i < list.length; i++) {
-    const sc = score(list[i], ctx);
+    const sc = score(list[i], ctx, kind);
     if (sc > topScore) {
       top = list[i];
       topScore = sc;
@@ -479,13 +482,20 @@ function pickForSlot(sl: Slot, ctx: Ctx, used: Set<string>): { ex: LibraryExerci
   const chain: Pattern[] = [sl.pattern, ...FALLBACK[sl.pattern]];
   for (let ci = 0; ci < chain.length; ci++) {
     const p = chain[ci];
-    const base = EXERCISE_LIBRARY.filter((e) => e.pattern === p && isAvailable(e, ctx.setup) && e.difficulty <= ctx.ceiling && !used.has(e.id));
-    const safe = base.filter((e) => !hitsLimit(e, ctx));
+    const lift = sl.kind === "main" || sl.kind === "secondary";
+    const prefer = (list: LibraryExercise[]) => {
+      if (!lift) return list;
+      const solid = list.filter((e) => !e.accessoryOnly);
+      return solid.length ? solid : list;
+    };
+    const all = EXERCISE_LIBRARY.filter((e) => e.pattern === p && isAvailable(e, ctx.setup) && e.difficulty <= ctx.ceiling && !used.has(e.id));
+    const base = prefer(all);
+    const safe = prefer(all.filter((e) => !hitsLimit(e, ctx)));
     if (!safe.length) continue;
-    let chosen = best(safe, ctx);
+    let chosen = best(safe, ctx, sl.kind);
     let note: string | undefined;
     if (ci === 0) {
-      const ideal = best(base, ctx);
+      const ideal = best(base, ctx, sl.kind);
       if (ideal.id !== chosen.id) {
         const lim = hitsLimit(ideal, ctx);
         if (lim) {
@@ -518,6 +528,7 @@ function setCap(goal: Goal, exp: Experience, kind: Kind): number {
 }
 
 function repsFor(ex: LibraryExercise, kind: Kind, goal: Goal, exp: Experience): string {
+  if (ex.repsOverride) return ex.repsOverride;
   if (ex.unit === "sec") return kind === "core" ? "30–40 s" : "20–30 s";
   if (ex.unit === "m") return goal === "strength" ? "20–30 m" : "30–40 m";
   if (ex.unit === "steps") return "10–12 steps each way";
@@ -643,7 +654,7 @@ function increaseOnce(cur: Row[], pool: Row[], maxCount: number, limit: number, 
 
 function fitRows(pool: Row[], target: number, minutes: Minutes, warmMin: number, finMin: number, exp: Experience): Row[] {
   const minCount = minutes === 30 ? 3 : 4;
-  const maxCount = exp === "never" ? 8 : 9;
+  const maxCount = 9;
   const start = Math.min(Math.max(START_COUNT[minutes], minCount), pool.length);
   const cur = pool.slice(0, start).map((r) => ({ ...r }));
   const hi = target * 60 * 1.1;
@@ -715,7 +726,7 @@ function warmupLines(region: Template["region"], ctx: Ctx, warmMin: number, firs
   else if (wrist && region !== "lower") lines.push("Wrist circles ×10 each way, then open and close your fists ×10.");
   else lines.push(region3[2]);
 
-  const bodyweightFirst = firstLift.equip.length === 1 && firstLift.equip[0] === "bodyweight";
+  const bodyweightFirst = firstLift.equip.includes("bodyweight") && (ctx.setup === "home-bodyweight" || firstLift.equip.length === 1);
   lines.push(
     bodyweightFirst
       ? `Ramp-up: 1 easy set of ${firstLift.name} at half the reps.`
@@ -739,12 +750,12 @@ function buildFinisher(goal: Goal, finMin: number, ctx: Ctx): { name: string; de
     const detail = steady
       ? `${finMin} min steady, pushing the pace for the last 30 s of every minute. ${pick.cue}`
       : `${Math.max(2, Math.floor((finMin * 60) / 90))} rounds of 30 s hard, 60 s easy. ${pick.cue}`;
-    return { name: `Finisher: ${pick.name}`, detail };
+    return { name: pick.name, detail };
   }
   if (goal === "general") {
     const order = ["incline-walk", "bike", "march"];
     const pick = order.map((id) => BY_ID.get(id)!).find(ok) ?? BY_ID.get("march")!;
-    return { name: `Zone-2: ${pick.name}`, detail: `${finMin} min at an easy, conversational pace; you should be able to speak in full sentences.` };
+    return { name: pick.name, detail: `Zone 2: ${finMin} min at an easy, conversational pace; you should be able to speak in full sentences.` };
   }
   const area = ctx.limits.has("lower-back") ? "stretch gently and skip any deep forward folds" : "hold each stretch for 30 s";
   return { name: "Cooldown and mobility", detail: `${finMin} min easy walking, then stretch what you trained and ${area}.` };
@@ -775,10 +786,14 @@ function buildRules(intake: TrainingIntake): string[] {
 function buildProgression(intake: TrainingIntake): TrainingPlan["progression"] {
   const bodyweightish = intake.setup === "home-bodyweight" || intake.setup === "home-bands";
   const noLoad = bodyweightish ? " No heavier weights? Slow the lowering to 3–4 s, pause 1 s at the bottom, or step up to the next variation." : "";
+  const startLine = bodyweightish
+    ? "Choose the variation you can finish every set of with 3 clean reps still in reserve (about RPE 6–7)."
+    : "Pick starting weights you could lift 3 more times at the end of every set (about RPE 6–7).";
+  const tempoLine = intake.experience === "intermediate" ? "Keep every rep controlled and leave this week as a baseline." : "Use the tempo shown and treat this week as practice.";
   const w1 = {
     week: 1,
     title: "Learn the movements",
-    instruction: `Pick starting weights you could lift 3 more times at the end of every set (about RPE 6–7). Use the tempo shown and treat this week as practice.`,
+    instruction: `${startLine} ${tempoLine}`,
   };
   const per: Record<Goal, [string, string, string]> = {
     strength: [
@@ -851,7 +866,7 @@ export function generateTrainingPlan(intake: TrainingIntake): TrainingPlan {
     return {
       id: `s${i + 1}`,
       name: entry.name ?? tpl.name,
-      focus: tpl.focus,
+      focus: `${REGION_FOCUS[tpl.region]} Leads with ${listWords(rows.slice(0, 3).map((r) => r.ex.name))}.`,
       weekday: weekdays[i],
       warmup: warmupLines(tpl.region, ctx, warmMin, rows[0].ex),
       exercises,
@@ -870,7 +885,7 @@ export function generateTrainingPlan(intake: TrainingIntake): TrainingPlan {
     general: "Moderate sets and reps build a balanced base, with an easy zone-2 block to finish.",
   };
   const summary = [
-    `Written for a ${EXP_LABEL[exp]} training ${days} days a week for ${minutes} minutes, aiming at ${GOAL_LABEL[goal]} with ${SETUP_LABEL[setup]}.`,
+    `Written for ${/^[aeiou]/.test(EXP_LABEL[exp]) ? "an" : "a"} ${EXP_LABEL[exp]} training ${days} days a week for ${minutes} minutes, aiming at ${GOAL_LABEL[goal]} with ${SETUP_LABEL[setup]}.`,
     `Sessions fall on ${listWords(dayNames)}: ${REST_LOGIC[days]}`,
     goalSentence[goal],
     limitList.length ? `Exercises were chosen around your ${listWords(limitList)}; swaps are marked on the exercise.` : "",

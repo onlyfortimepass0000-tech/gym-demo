@@ -9,7 +9,7 @@ import { toast } from "./ui";
 const ROLES = [
   { href: "/member", label: "Member", who: "Karan Mehta · regular member, 5 months in", hint: "Check in, log sets, see the calendar, get a nutrition plan." },
   { href: "/beginner", label: "Beginner", who: "Riya Patel · joined today", hint: "Answer five questions and get a plan built around the answers." },
-  { href: "/trainer", label: "Trainer", who: "Coach Vikrant Shah · 13 clients", hint: "Every client's attendance, sets and progress. Message them." },
+  { href: "/trainer", label: "Trainer", who: "Coach Vikrant Shah · your clients", hint: "Every client's attendance, sets and progress. Message them." },
   { href: "/owner", label: "Owner", who: "Owner · whole gym", hint: "Footfall, revenue, churn risk, trainers and sign-ups." },
 ] as const;
 

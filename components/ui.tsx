@@ -129,10 +129,10 @@ export function Stat({
 }) {
   const color = tone === "green" ? "text-green" : tone === "red" ? "text-red" : "text-ink";
   return (
-    <div className="panel-flat p-4">
+    <div className="panel-flat min-w-0 p-3 sm:p-4">
       <div className="kicker">{label}</div>
-      <div className={`num mt-2 text-[44px] ${color}`}>{value}</div>
-      {sub && <div className="mt-1.5 text-[13px] text-ink-2">{sub}</div>}
+      <div className={`num mt-2 text-[34px] sm:text-[44px] ${color}`}>{value}</div>
+      {sub && <div className="mt-1.5 text-[12px] leading-snug text-ink-2 sm:text-[13px]">{sub}</div>}
     </div>
   );
 }

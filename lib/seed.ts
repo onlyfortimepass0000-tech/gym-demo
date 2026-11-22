@@ -67,13 +67,23 @@ const ROSTER: [string, "male" | "female"][] = [
   ["Devang Parikh", "male"], ["Esha Wagle", "female"], ["Chirag Lokhande", "male"], ["Ria Fernandes", "female"],
 ];
 
+const FIRST_M = ["Aman", "Bhavesh", "Chetan", "Dev", "Eshaan", "Farhan", "Gaurav", "Hriday", "Ishaan", "Jatin", "Kunal", "Lakshay", "Mihir", "Nitin", "Omkar", "Pranav", "Rajat", "Sahil", "Tushar", "Uday", "Vedant", "Yuvraj", "Zubin", "Abhay", "Rudra"];
+const FIRST_F = ["Aditi", "Bhumi", "Charvi", "Disha", "Ekta", "Falak", "Gauri", "Heena", "Isha", "Juhi", "Kiara", "Lavanya", "Mansi", "Navya", "Ojal", "Palak", "Rhea", "Sakshi", "Trisha", "Urvi", "Vidhi", "Yamini", "Zara", "Avni", "Reva"];
+const LAST = ["Shah", "Patel", "Mehta", "Iyer", "Nair", "Rao", "Kulkarni", "Joshi", "Desai", "Gupta", "Sharma", "Pillai", "Bhatt", "Kapoor", "Menon", "Verma", "Naik", "Pawar", "Jain", "Thakur", "Chavan", "Gokhale", "Rane", "Sawant", "Doshi", "Vora", "Khan", "Fernandes", "Bose", "Singh"];
+for (let k = 0; k < 52; k++) {
+  const male = k % 2 === 0;
+  const first = (male ? FIRST_M : FIRST_F)[Math.floor(k / 2) % 25];
+  const last = LAST[(k * 7 + 3) % LAST.length];
+  ROSTER.push([`${first} ${last}`, male ? "male" : "female"]);
+}
+
 const EXPERIENCES: Experience[] = ["never", "some", "some", "returning", "intermediate", "intermediate", "intermediate"];
 const GOALS: Goal[] = ["fat-loss", "muscle", "muscle", "strength", "general", "fat-loss"];
 const LIMITS: Limitation[] = ["knee", "lower-back", "shoulder"];
 const DIETS: Diet[] = ["veg", "veg", "veg", "veg", "egg", "nonveg", "nonveg", "nonveg", "jain", "vegan"];
 const TIERS: PlanTier[] = ["Monthly", "Monthly", "Monthly", "Quarterly", "Quarterly", "Annual"];
 const DAYS_OPTIONS: (2 | 3 | 4 | 5)[] = [3, 3, 4, 4, 4, 5, 2];
-const HOURS = [6, 7, 7, 8, 12, 13, 17, 18, 18, 19, 19, 20];
+const HOURS = [6, 7, 7, 8, 9, 12, 13, 17, 18, 18, 18, 19, 19, 19, 20, 20];
 const CYCLE_DAYS: Record<PlanTier, number> = { Monthly: 30, Quarterly: 90, Annual: 365 };
 
 function buildRoster(): Member[] {
@@ -83,7 +93,7 @@ function buildRoster(): Member[] {
     id: "karan", name: "Karan Mehta", sex: "male", age: 24, heightCm: 176, weightKg: 72,
     tier: "Monthly", joinedDaysAgo: 150, renewsInDays: 12, trainerId: "vikrant",
     goal: "muscle", experience: "intermediate", daysPerWeek: 4, limitations: [],
-    attendance: 0.86, hour: 18, lapsedDays: 0, persona: true, blank: false, seedNutrition: false, diet: "veg",
+    attendance: 0.74, hour: 18, lapsedDays: 0, persona: true, blank: false, seedNutrition: false, diet: "veg",
   });
   members.push({
     id: "riya", name: "Riya Patel", sex: "female", age: 21, heightCm: 163, weightKg: 56,
@@ -97,8 +107,8 @@ function buildRoster(): Member[] {
     const r = (k: string) => rnd(`${id}:${k}`);
     const tier = pick(`${id}:tier`, TIERS);
     let lapsed = 0;
-    if (i % 7 === 3) lapsed = 11 + Math.floor(r("lapse") * 14);
-    else if (i % 9 === 5) lapsed = 4 + Math.floor(r("lapse") * 5);
+    if (i % 9 === 3) lapsed = 11 + Math.floor(r("lapse") * 14);
+    else if (i % 11 === 5) lapsed = 5 + Math.floor(r("lapse") * 4);
     const experience = pick(`${id}:exp`, EXPERIENCES);
     const limit = r("limit") < 0.15 ? [pick(`${id}:lim`, LIMITS)] : [];
     members.push({
@@ -114,7 +124,7 @@ function buildRoster(): Member[] {
       experience,
       daysPerWeek: pick(`${id}:days`, DAYS_OPTIONS),
       limitations: limit,
-      attendance: 0.4 + r("att") * 0.5,
+      attendance: 0.52 + r("att") * 0.43,
       hour: pick(`${id}:hour`, HOURS),
       lapsedDays: lapsed,
       persona: false, blank: false, seedNutrition: r("nut") < 0.6,
@@ -172,7 +182,7 @@ function sessionFor(m: Member, dayTs: number, plannedWeekdays: number[]): Sessio
   const key = dayKey(dayTs);
   const weekday = new Date(dayTs).getDay();
   const planned = plannedWeekdays.includes(weekday);
-  const chance = planned ? m.attendance : 0.05;
+  const chance = planned ? m.attendance : weekday === 6 ? 0.3 : weekday === 0 ? 0.2 : 0.07;
   if (rnd(`${m.id}:${key}:go`) >= chance) return null;
   const hourJitter = (rnd(`${m.id}:${key}:h`) - 0.5) * 2;
   const minute = Math.floor(rnd(`${m.id}:${key}:min`) * 60);

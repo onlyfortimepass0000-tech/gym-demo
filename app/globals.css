@@ -42,6 +42,10 @@ body {
   background: var(--yellow);
   color: var(--ink);
 }
+/* Grid items must be allowed to shrink or one wide table/heading stretches the whole page on phones. */
+.grid > * {
+  min-width: 0;
+}
 button {
   font: inherit;
   cursor: pointer;
@@ -367,6 +371,7 @@ button:disabled {
   background: rgba(255, 210, 31, 0.1);
 }
 .table-wrap {
+  position: relative; /* clips absolutely positioned sr-only text inside wide tables */
   overflow-x: auto;
 }
 
@@ -382,7 +387,7 @@ button:disabled {
   font-weight: 500;
   font-size: 15px;
 }
-.setbox:hover:not(:disabled) {
+.setbox:hover:not(:disabled):not([aria-pressed="true"]) {
   background: var(--yellow-bg);
 }
 .setbox[aria-pressed="true"] {
